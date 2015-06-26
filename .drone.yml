@@ -1,6 +1,6 @@
 image: node0.10
 script:
-  - ./test_drone.sh
+  - make test
   - nvm install 0.10.29
   - nvm use 0.10.29
 env:
