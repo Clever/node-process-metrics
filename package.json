@@ -17,5 +17,5 @@
   "publishConfig": {
     "registry": "https://clever.registry.nodejitsu.com"
   },
-  "name": "node-process-metrics"
+  "name": "process-metrics"
 }
