@@ -46,8 +46,8 @@ log_pauses = (source) ->
 
 # log_metrics logs node process metrics at the specified frequency. It also logs every time the
 # node event loop stops processing all the events for more than a second.
-module.exports.log_metrics = (source, frequency_ms) ->
+module.exports.log_metrics = (source, frequency_ms, pause_threshold_ms = 1000) ->
   setInterval _.partial(log_memory_usage, source), frequency_ms
-  start_pause_detector source, 100, 6000
+  start_pause_detector source, 100, pause_threshold_ms
   setInterval _.partial(log_pauses, source), frequency_ms
 
