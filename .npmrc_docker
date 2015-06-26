@@ -1,0 +1,5 @@
+ca = null
+_auth = ${NODEJITSU_AUTH}
+registry = https://clever.registry.nodejitsu.com/
+always-auth = true
+strict-ssl = false
