@@ -3,7 +3,6 @@ set -eu
 
 npm cache clean
 npm config set ca null
-npm config set registry https://clever.registry.nodejitsu.com/
 npm config set strict-ssl true
 npm config set always-auth true
 auth=`echo -n ${npmdeployusername}:${npmdeploypassword} | base64`
