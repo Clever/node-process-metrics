@@ -16,7 +16,6 @@ publish:
   npm:
     email: $$email
     password: $$npmdeploypassword
-    registry: https://clever.registry.nodejitsu.com
     username: $$npmdeployusername
     when:
       branch: master
