@@ -1,13 +1,15 @@
 _ = require 'underscore'
 kayvee = require 'kayvee'
 
+env = process.env.ENV or 'staging'
+
 # log_memory_usage logs HeapUsed, HeapTotal, and RSS in the kayvee format
 log_memory_usage = (source) ->
     mem = process.memoryUsage()
-    console.error kayvee.formatLog(source, kayvee.INFO, 'HeapUsed', {type: "gauge", value: mem.heapUsed})
-    console.error kayvee.formatLog(source, kayvee.INFO, 'HeapTotal', {type: "gauge", value: mem.heapTotal})
-    console.error kayvee.formatLog(source, kayvee.INFO, 'RSS', {type: "gauge", value: mem.rss})
-
+    type = "gauge"
+    console.error kayvee.formatLog source, kayvee.INFO, 'HeapUsed', {type, env, value: mem.heapUsed}
+    console.error kayvee.formatLog source, kayvee.INFO, 'HeapTotal', {type, env, value: mem.heapTotal}
+    console.error kayvee.formatLog source, kayvee.INFO, 'RSS', {type, env, value: mem.rss}
 
 # Exposing last period ms to make testing easier. It means a global variable, which isn't ideal, but I
 # think it makes the code cleaner in this case, and since this module is small it's not a big concern
@@ -31,7 +33,9 @@ start_pause_detector = (source, sleep_time_ms, pause_threshold_ms) ->
 
     # If the pause is long enough log it immediately so we can potentially associate it with an api request
     if pause_ms > pause_threshold_ms
-      console.error kayvee.formatLog(source, kayvee.INFO, 'Pause Detected', { pause_duration : pause_ms})
+      console.error kayvee.formatLog source, kayvee.INFO, 'Pause Detected',
+        pause_duration: pause_ms
+        env: env
 
     # Update the variables for the next call
     module.exports._last_period_pause_ms += pause_ms
@@ -40,7 +44,10 @@ start_pause_detector = (source, sleep_time_ms, pause_threshold_ms) ->
   setInterval pause_fn, sleep_time_ms
 
 log_pauses = (source) ->
-  console.error kayvee.formatLog(source, kayvee.INFO, 'PauseMetric', { type: "gauge", value : module.exports._last_period_pause_ms})
+  console.error kayvee.formatLog source, kayvee.INFO, 'PauseMetric',
+    type: "gauge"
+    value: module.exports._last_period_pause_ms
+    env: env
   module.exports._last_period_pause_ms = 0
 
 
