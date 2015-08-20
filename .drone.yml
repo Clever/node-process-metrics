@@ -1,7 +1,3 @@
-env:
-- npmdeployusername=$$npmdeployusername
-- npmdeploypassword=$$npmdeploypassword
-- email=$$email
 image: node0.10
 notify:
   email:
@@ -20,6 +16,8 @@ publish:
     when:
       branch: master
 script:
-- ./test_drone.sh
-- nvm install 0.10.29
-- nvm use 0.10.29
+  - npm config set ca ""
+  - npm install
+  - nvm install 0.10.29
+  - nvm use 0.10.29
+  - make test
