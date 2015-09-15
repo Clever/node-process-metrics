@@ -1,18 +1,21 @@
 {
+  "name": "@clever/process-metrics",
   "version": "0.2.1",
-  "engines": {
-    "node": ">=0.10.x"
-  },
-  "author": "clever team <tech-notify@clever.com>",
   "description": "process-metrics",
+  "author": "clever team <tech-notify@clever.com>",
   "dependencies": {
     "coffee-script": "~1.6.2",
     "kayvee": "^1.0.3",
     "underscore": "~1.4.4"
   },
   "devDependencies": {
-    "coffee-errors": "~0.8.6",          
+    "coffee-errors": "~0.8.6",
     "mocha": "~1.6.0"
   },
-  "name": "process-metrics"
+  "engines": {
+    "node": ">=0.10.x"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  }
 }
