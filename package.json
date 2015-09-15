@@ -1,6 +1,6 @@
 {
   "name": "@clever/process-metrics",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "process-metrics",
   "author": "clever team <tech-notify@clever.com>",
   "dependencies": {
@@ -19,3 +19,4 @@
     "registry": "https://registry.npmjs.org"
   }
 }
+  
