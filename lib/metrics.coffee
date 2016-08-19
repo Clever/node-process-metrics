@@ -1,7 +1,7 @@
 _ = require 'underscore'
 kayvee = require 'kayvee'
 
-env = process.env.ENV or 'staging'
+env = process.env.NODE_ENV or 'staging'
 
 # log_memory_usage logs HeapUsed, HeapTotal, and RSS in the kayvee format
 log_memory_usage = (source) ->
