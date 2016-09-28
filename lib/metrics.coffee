@@ -1,5 +1,6 @@
 _ = require 'underscore'
 kayvee = require 'kayvee'
+memwatch = require 'memwatch'
 
 env = process.env.NODE_ENV or 'staging'
 
@@ -58,3 +59,8 @@ module.exports.log_metrics = (source, frequency_ms, pause_threshold_ms = 1000) -
   start_pause_detector source, 100, pause_threshold_ms
   setInterval _.partial(log_pauses, source), frequency_ms
 
+  memwatch.on 'stats', (stats) ->
+    kayvee_logger.counterD 'gc-stats', 1, stats
+
+  memwatch.on 'leak', (info) ->
+    kayvee_logger.counterD 'gc-leak', 1, info
