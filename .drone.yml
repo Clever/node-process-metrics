@@ -1,6 +1,3 @@
-env:
-- REPORT_CARD_GITHUB_STATUS_TOKEN=$$report_card_github_status_token
-- REPORT_CARD_GITHUB_REPO_TOKEN=$$report_card_github_repo_token
 image: node0.10
 notify:
   email:
@@ -13,15 +10,16 @@ notify:
     webhook_url: $$slack_webhook
 publish:
   npm:
-    email: $$email
-    password: $$npmdeploypassword
-    username: $$npmdeployusername
+    email: $$npm_drone_email
+    password: $$npm_drone_password
+    registry: https://registry.npmjs.org
+    username: $$npm_drone_username
     when:
       branch: master
 script:
-- sudo pip install -q git+https://$REPORT_CARD_GITHUB_REPO_TOKEN@github.com/Clever/report-card.git; GITHUB_API_TOKEN=$REPORT_CARD_GITHUB_STATUS_TOKEN report-card --publish || true
+- nvm install 0.10.29
+- npm install npm@2.7.0 -g
 - npm config set ca ""
 - npm install
-- nvm install 0.10.29
-- nvm use 0.10.29
 - make test
+
