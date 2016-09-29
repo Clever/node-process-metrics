@@ -16,9 +16,9 @@ publish:
     when:
       branch: master
 script:
-- nvm install 0.10.29
-- npm install npm@2.7.0 -g
 - npm config set ca ""
 - npm install
-- make test
+- npm test
+- nvm install 0.10.29
+- nvm use 0.10.29
 
