@@ -1,4 +1,4 @@
-image: clever/drone-node:6.2.2
+image: clever/drone-node:5.7.0
 notify:
   email:
     recipients:
