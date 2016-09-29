@@ -1,6 +1,6 @@
 _ = require 'underscore'
 kayvee = require 'kayvee'
-memwatch = require 'memwatch'
+memwatch = require 'memwatch-next'
 
 env = process.env.NODE_ENV or 'staging'
 
