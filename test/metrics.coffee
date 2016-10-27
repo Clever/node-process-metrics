@@ -14,7 +14,7 @@ describe 'pause test', ->
     process.nextTick ->
       # Do a bunch of stuff to monopolize the event loop
       total = 0
-      for num in [1..1000000000]
+      for num in [1..2000000000]
         total += num
 
       # Confirm that the last_period_pause_ms was increased

@@ -18,7 +18,7 @@ publish:
 script:
 - npm config set ca ""
 - npm install
-- npm test
+- make test
 - nvm install 0.10.29
 - nvm use 0.10.29
 
