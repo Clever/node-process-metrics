@@ -1,23 +1,19 @@
 # usage:
 # `make` or `make test` runs all the tests
 # `make successful_run` runs just that test
-.PHONY: test clean test-cov
+.PHONY: test clean
 
-TESTS=$(shell cd test && ls *.js | sed s/\.js$$// | grep -v migration)
+TESTS=$(shell cd test && ls *.ts | sed s/\.ts$$// | grep -v migration)
 
 all: test
 
 test: $(TESTS)
 
 $(TESTS):
-	NODE_ENV=test node_modules/mocha/bin/mocha --reporter spec --ignore-leaks --bail --timeout 180000 test/$@.js
+	NODE_ENV=test node_modules/mocha/bin/mocha --compilers ts:ts-node/register --reporter spec --ignore-leaks --bail --timeout 180000 test/$@.ts
 
 clean:
-	rm -rf lib-js lib-js-cov
+	rm -rf lib-js
 
-test-cov:
-	jscoverage lib lib-cov
-	mkdir lib-cov/ps_md5
-	cp lib/ps_md5/md5.js lib-cov/ps_md5/md5.js
-	DEBUG=* NODE_ENV=test TEST_COV_CLEVER_DB=1 node_modules/mocha/bin/mocha -R html-cov --timeout 60000 test/ | tee coverage.html
-	open coverage.html
+build:
+	node_modules/.bin/tsc

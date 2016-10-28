@@ -12,9 +12,7 @@ function log_memory_usage(source) {
   console.error(kayvee.formatLog(source, kayvee.INFO, "RSS", { type, env, value: mem.rss }));
 };
 
-// Exposing last period ms to make testing easier. It means a global variable, which isn't ideal, but I
-// think it makes the code cleaner in this case, and since this module is small it's not a big concern
-module.exports._last_period_pause_ms = 0;
+let _last_period_pause_ms = 0;
 
 // pause_detector is useful for determining if node isn't processing the event loop. There are
 // two common explanations for these pauses:
@@ -41,7 +39,8 @@ function start_pause_detector(source, sleep_time_ms, pause_threshold_ms) {
     }
 
     // Update the variables for the next call
-    module.exports._last_period_pause_ms += pause_ms;
+    console.log("LAST PAUSE", pause_ms)
+    _last_period_pause_ms += pause_ms;
     last_time_ms = current_time_ms;
   };
 
@@ -51,16 +50,19 @@ function start_pause_detector(source, sleep_time_ms, pause_threshold_ms) {
 function log_pauses(source) {
   console.error(kayvee.formatLog(source, kayvee.INFO, "PauseMetric", {
     type: "gauge",
-    value: module.exports._last_period_pause_ms,
+    value: _last_period_pause_ms,
     env,
   }));
-  module.exports._last_period_pause_ms = 0;
+  _last_period_pause_ms = 0;
 };
 
 // log_metrics logs node process metrics at the specified frequency. It also logs every time the
 // node event loop stops processing all the events for more than a second.
 module.exports.log_metrics = (source, frequency_ms, pause_threshold_ms = 1000) => {
   setInterval(_.partial(log_memory_usage, source), frequency_ms);
+  console.log("PAUSE DET")
   start_pause_detector(source, 100, pause_threshold_ms);
   setInterval(_.partial(log_pauses, source), frequency_ms);
 };
+
+module.exports._get_last_period_pause_ms = () => _last_period_pause_ms;
