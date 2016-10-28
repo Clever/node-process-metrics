@@ -1,4 +1,4 @@
-image: node0.10
+image: clever/drone-node:6.2.2
 notify:
   email:
     recipients:
@@ -19,6 +19,6 @@ script:
 - npm config set ca ""
 - npm install
 - make test
-- nvm install 0.10.29
-- nvm use 0.10.29
+- nvm install 6
+- nvm use 6
 

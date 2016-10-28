@@ -9,19 +9,19 @@
   "author": "clever team <tech-notify@clever.com>",
   "description": "process-metrics",
   "dependencies": {
+    "kayvee": "^1.0.3",
+    "underscore": "~1.4.4"
+  },
+  "devDependencies": {
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.46",
     "babel-eslint": "^7.0.0",
     "eslint": "^3.8.1",
     "eslint-config-airbnb": "^5.0.1",
     "eslint-plugin-react": "^3.16.1",
-    "kayvee": "^1.0.3",
+    "mocha": "~1.6.0",
     "ts-node": "^1.6.1",
-    "typescript": "^2.0.6",
-    "underscore": "~1.4.4"
-  },
-  "devDependencies": {
-    "mocha": "~1.6.0"
+    "typescript": "^2.0.6"
   },
   "name": "process-metrics"
 }
