@@ -1,5 +1,5 @@
-import node_metrics from "../lib/metrics";
-import assert from 'assert';
+const node_metrics = require("../lib/metrics");
+const assert = require('assert');
 
 describe('pause test', function() {
 
@@ -15,10 +15,8 @@ describe('pause test', function() {
     return process.nextTick(function() {
       // Do a bunch of stuff to monopolize the event loop
       let total = 0;
-      let iterable = __range__(1, 2000000000, true);
-      for (let i = 0; i < iterable.length; i++) {
-        let num = iterable[i];
-        total += num;
+      for (let i = 0; i < 100000000; i++) {
+        total += i;
       }
 
       // Confirm that the last_period_pause_ms was increased
@@ -30,14 +28,3 @@ describe('pause test', function() {
     });
   });
 });
-
-
-function __range__(left, right, inclusive) {
-  let range = [];
-  let ascending = left < right;
-  let end = !inclusive ? right : ascending ? right + 1 : right - 1;
-  for (let i = left; ascending ? i < end : i > end; ascending ? i++ : i--) {
-    range.push(i);
-  }
-  return range;
-}
