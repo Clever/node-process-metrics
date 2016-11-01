@@ -1,0 +1,19 @@
+extends: "airbnb"
+parser: "babel-eslint"
+parserOptions:
+  ecmaVersion: 6
+plugins:
+  - "react"
+env:
+  mocha: true
+rules:
+  max-len: ["error", 120, 2, { # 120 max len, 2 tab width
+    ignoreUrls: true,
+    ignoreComments: false
+  }]
+  quotes: ["error", "double", "avoid-escape"]
+  no-shadow: ["error", {
+    builtinGlobals: true, # disallow shadowing of globals like Object and Number
+    allow: ["err"]
+  }]
+  eqeqeq: ["error", "always", {"null": "ignore"}]
