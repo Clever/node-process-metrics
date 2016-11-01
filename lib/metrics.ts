@@ -39,7 +39,6 @@ function start_pause_detector(source, sleep_time_ms, pause_threshold_ms) {
     }
 
     // Update the variables for the next call
-    console.log("LAST PAUSE", pause_ms)
     _last_period_pause_ms += pause_ms;
     last_time_ms = current_time_ms;
   };
@@ -60,7 +59,6 @@ function log_pauses(source) {
 // node event loop stops processing all the events for more than a second.
 module.exports.log_metrics = (source, frequency_ms, pause_threshold_ms = 1000) => {
   setInterval(_.partial(log_memory_usage, source), frequency_ms);
-  console.log("PAUSE DET")
   start_pause_detector(source, 100, pause_threshold_ms);
   setInterval(_.partial(log_pauses, source), frequency_ms);
 };
