@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0",
+  "version": "0.4.1",
   "engines": {
     "node": ">=0.10.x"
   },
@@ -9,8 +9,7 @@
   "author": "clever team <tech-notify@clever.com>",
   "description": "process-metrics",
   "dependencies": {
-    "kayvee": "^1.0.3",
-    "underscore": "~1.4.4"
+    "kayvee": "^3.2.0"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.32",
