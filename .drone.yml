@@ -16,3 +16,4 @@ publish:
 script:
 - npm install
 - make test
+- make build
