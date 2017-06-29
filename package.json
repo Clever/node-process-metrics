@@ -9,7 +9,8 @@
   "author": "clever team <tech-notify@clever.com>",
   "description": "process-metrics",
   "dependencies": {
-    "kayvee": "^3.2.0"
+    "kayvee": "^3.2.0",
+    "ts-node": "^3.1.0"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.32",
