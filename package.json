@@ -9,8 +9,7 @@
   "author": "clever team <tech-notify@clever.com>",
   "description": "process-metrics",
   "dependencies": {
-    "kayvee": "^3.2.0",
-    "ts-node": "^3.1.0"
+    "kayvee": "^3.2.0"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.32",
@@ -20,7 +19,7 @@
     "eslint-config-airbnb": "^5.0.1",
     "eslint-plugin-react": "^3.16.1",
     "mocha": "~1.6.0",
-    "ts-node": "^1.6.1",
+    "ts-node": "^3.1.0",
     "typescript": "^2.0.6"
   },
   "name": "process-metrics"
