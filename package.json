@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@types/mocha": "^2.2.32",
-    "@types/node": "^10.14.21",
+    "@types/node": "^12.12.24",
     "babel-eslint": "^7.0.0",
     "eslint": "^3.8.1",
     "eslint-config-airbnb": "^5.0.1",
