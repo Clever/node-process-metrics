@@ -6,7 +6,7 @@
   "scripts": {
     "prepublish": "make build"
   },
-  "author": "clever team <tech-notify@clever.com>",
+  "author": "Clever Team <tech-notify@clever.com>",
   "description": "process-metrics",
   "dependencies": {
     "kayvee": "^3.13.0"
