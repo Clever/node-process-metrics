@@ -4,7 +4,8 @@
     "node": ">=12"
   },
   "scripts": {
-    "prepare": "make build",
+    "prepare": "tsc",
+    "lint": "eslint",
     "test": "mocha --require ts-node/register --exit test/*"
   },
   "author": "Clever Team <tech-notify@clever.com>",

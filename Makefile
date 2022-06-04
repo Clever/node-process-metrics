@@ -12,4 +12,4 @@ clean:
 	rm -rf lib-js
 
 build:
-	node_modules/.bin/tsc
+	npm run build
