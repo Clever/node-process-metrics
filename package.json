@@ -16,7 +16,7 @@
     "@types/mocha": "^9",
     "@types/node": "^12.12.24",
     "babel-eslint": "^7.0.0",
-    "eslint": "^3.8.1",
+    "eslint": "^8.17.0",
     "eslint-config-airbnb": "^5.0.1",
     "eslint-plugin-react": "^3.16.1",
     "mocha": "^9",
