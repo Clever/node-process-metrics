@@ -5,7 +5,7 @@
   },
   "scripts": {
     "prepare": "make build",
-    "test": "NODE_ENV=test node_modules/mocha/bin/mocha --compilers ts:ts-node/register --reporter spec --ignore-leaks --bail --timeout 180000 test/*"
+    "test": "mocha --require ts-node/register --exit test/*"
   },
   "author": "Clever Team <tech-notify@clever.com>",
   "description": "process-metrics",
