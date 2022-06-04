@@ -1,11 +1,11 @@
 const nodeMetrics = require("../lib/metrics");
 const assert = require("assert");
 
-describe("pause test", () => {
+describe("Pause test", () => {
   // Start up the pause detector
   before(() => nodeMetrics.log_metrics("source", 10000));
 
-  it("test2", (done) => {
+  it("should record a later time after event loop is blocked", (done) => {
     assert.equal(nodeMetrics._get_last_period_pause_ms(), 0);
 
     process.nextTick(() => {
