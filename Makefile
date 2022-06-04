@@ -11,5 +11,5 @@ test:
 clean:
 	rm -rf lib-js
 
-build:
-	npm run build
+build: clean
+	npm run prepare
