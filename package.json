@@ -1,26 +1,33 @@
 {
-  "version": "0.4.2",
+  "version": "0.4.3",
   "engines": {
-    "node": ">=0.10.x"
+    "node": ">=12"
   },
   "scripts": {
-    "prepublish": "make build"
+    "prepare": "tsc",
+    "lint": "eslint",
+    "test": "mocha --require ts-node/register --exit test/*"
   },
-  "author": "clever team <tech-notify@clever.com>",
+  "author": "Clever Team <tech-notify@clever.com>",
   "description": "process-metrics",
   "dependencies": {
     "kayvee": "^3.13.0"
   },
   "devDependencies": {
-    "@types/mocha": "^2.2.32",
+    "@types/mocha": "^9",
     "@types/node": "^12.12.24",
     "babel-eslint": "^7.0.0",
-    "eslint": "^3.8.1",
+    "eslint": "^8.17.0",
     "eslint-config-airbnb": "^5.0.1",
     "eslint-plugin-react": "^3.16.1",
-    "mocha": "^2.5.3",
+    "mocha": "^9",
     "ts-node": "^3.1.0",
-    "typescript": "^2.0.6"
+    "typescript": "^3"
   },
-  "name": "process-metrics"
+  "name": "process-metrics",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Clever/node-process-metrics.git"
+  },
+  "license": "Apache-2.0"
 }

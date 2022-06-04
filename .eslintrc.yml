@@ -6,6 +6,8 @@ plugins:
   - "react"
 env:
   mocha: true
+ignorePatterns:
+  - "node_modules/*"
 rules:
   max-len: ["error", 120, 2, { # 120 max len, 2 tab width
     ignoreUrls: true,
