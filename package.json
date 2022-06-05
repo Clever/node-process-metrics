@@ -6,7 +6,7 @@
   "scripts": {
     "prepare": "tsc",
     "lint": "eslint",
-    "test": "mocha --require ts-node/register --exit test/*"
+    "test": "mocha --require ts-node/register --timeout 15000 --exit test/*"
   },
   "author": "Clever Team <tech-notify@clever.com>",
   "description": "process-metrics",
