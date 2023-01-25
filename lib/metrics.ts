@@ -1,4 +1,6 @@
-const kv = require("kayvee");
+import { performance } from "perf_hooks";
+import * as http from "http";
+import * as kv from "kayvee";
 
 const env = process.env.NODE_ENV || "staging"; // TODO: "staging" is a non-sense word at Clever
 
@@ -18,7 +20,7 @@ function log_memory_usage(log) {
   log("HeapUsed", "gauge", mem.heapUsed);
   log("HeapTotal", "gauge", mem.heapTotal);
   log("RSS", "gauge", mem.rss);
-};
+}
 
 // pause_detector is useful for determining if node isn't processing the event loop. There are
 // two common explanations for these pauses:
@@ -47,16 +49,20 @@ function start_pause_detector(log, sleep_time_ms, pause_threshold_ms) {
   };
 
   setInterval(pause_fn, sleep_time_ms);
-};
+}
 
 function log_pauses(log) {
   log("PauseMetric", "gauge", _last_period_pause_ms);
   _last_period_pause_ms = 0;
-};
+}
 
 // log_metrics logs node process metrics at the specified frequency. It also logs every time the
 // node event loop stops processing all the events for more than a second.
-module.exports.log_metrics = (source, frequency_ms, pause_threshold_ms = 1000) => {
+module.exports.log_metrics = (
+  source,
+  frequency_ms,
+  pause_threshold_ms = 1000
+) => {
   const log = logger(source);
 
   setInterval(() => log_memory_usage(log), frequency_ms);
@@ -65,3 +71,39 @@ module.exports.log_metrics = (source, frequency_ms, pause_threshold_ms = 1000) =
 };
 
 module.exports._get_last_period_pause_ms = () => _last_period_pause_ms;
+
+module.exports.log_event_loop_metrics = (
+  source: string,
+  frequency_ms: number = 30000
+) => {
+  const logger = new kv.logger(source);
+  setInterval(() => {
+    const { idle, active, utilization } = performance.eventLoopUtilization();
+    logger.infoD("event-loop-utilization", {
+      idle,
+      active,
+      utilization,
+    });
+  }, frequency_ms);
+};
+
+module.exports.log_active_connections = (
+  source: string,
+  server: http.Server,
+  frequency_ms: number = 30000
+) => {
+  const logger = new kv.logger(source);
+  setInterval(() => {
+    server.getConnections((err, count) => {
+      if (!err) {
+        logger.infoD("active-connections", {
+          count,
+        });
+      } else {
+        logger.errorD("error-getting-active-connections", {
+          error: err,
+        });
+      }
+    });
+  }, frequency_ms);
+};
