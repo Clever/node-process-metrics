@@ -1,4 +1,5 @@
 import { performance } from "perf_hooks";
+import * as http from "http";
 import * as kv from "kayvee";
 
 const env = process.env.NODE_ENV || "staging"; // TODO: "staging" is a non-sense word at Clever
@@ -72,9 +73,9 @@ module.exports.log_metrics = (
 module.exports._get_last_period_pause_ms = () => _last_period_pause_ms;
 
 module.exports.log_event_loop_metrics = (source, frequency_ms = 30000) => {
-  const { idle, active, utilization } = performance.eventLoopUtilization();
   const logger = new kv.logger(source);
   setInterval(() => {
+    const { idle, active, utilization } = performance.eventLoopUtilization();
     logger.infoD("event-loop-utilization", {
       idle,
       active,
@@ -83,3 +84,23 @@ module.exports.log_event_loop_metrics = (source, frequency_ms = 30000) => {
   }, frequency_ms);
 };
 
+module.exports.log_active_connections = (
+  source,
+  server: http.Server,
+  frequency_ms: number = 30000
+) => {
+  const logger = new kv.logger(source);
+  setInterval(() => {
+    server.getConnections((err, count) => {
+      if (!err) {
+        logger.infoD("active-connections", {
+          count,
+        });
+      } else {
+        logger.errorD("error-getting-active-connections", {
+          error: err,
+        });
+      }
+    });
+  }, frequency_ms);
+};
