@@ -72,7 +72,10 @@ module.exports.log_metrics = (
 
 module.exports._get_last_period_pause_ms = () => _last_period_pause_ms;
 
-module.exports.log_event_loop_metrics = (source, frequency_ms = 30000) => {
+module.exports.log_event_loop_metrics = (
+  source: string,
+  frequency_ms: number = 30000
+) => {
   const logger = new kv.logger(source);
   setInterval(() => {
     const { idle, active, utilization } = performance.eventLoopUtilization();
@@ -85,7 +88,7 @@ module.exports.log_event_loop_metrics = (source, frequency_ms = 30000) => {
 };
 
 module.exports.log_active_connections = (
-  source,
+  source: string,
   server: http.Server,
   frequency_ms: number = 30000
 ) => {
