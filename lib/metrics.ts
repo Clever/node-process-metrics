@@ -44,11 +44,11 @@ module.exports.log_metrics = (
   const log = logger(source);
 
   log_memory_usage(log, frequency_ms);
-  log_event_loop_metrics(log, frequency_ms);
+  log_event_loop_utilization(log, frequency_ms);
   log_event_loop_lag(log, frequency_ms);
 };
 
-function log_event_loop_metrics(log: metricLogger, frequency_ms: number) {
+function log_event_loop_utilization(log: metricLogger, frequency_ms: number) {
   let last: EventLoopUtilization;
   setInterval(() => {
     last = performance.eventLoopUtilization(last);
