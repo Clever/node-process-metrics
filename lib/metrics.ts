@@ -76,6 +76,8 @@ function log_event_loop_lag(log: metricLogger, frequency_ms: number) {
 
     log("event-loop-lag", histogram.mean, data);
 
+    // The histogram disables itself every time the data is read from
+    // so we must re-initialize it after every read.
     histogram = monitorEventLoopDelay({ resolution: 100 });
     histogram.enable();
   }, frequency_ms);
