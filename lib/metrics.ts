@@ -1,4 +1,9 @@
-import { performance } from "perf_hooks";
+import {
+  performance,
+  EventLoopUtilization,
+  monitorEventLoopDelay,
+  EventLoopDelayMonitor,
+} from "perf_hooks";
 import * as http from "http";
 import * as kv from "kayvee";
 
@@ -15,7 +20,7 @@ function logger(source): metricLogger {
 }
 
 // log_memory_usage logs HeapUsed, HeapTotal, and RSS in the kayvee format
-function log_memory_usage(log) {
+function log_memory_usage(log: metricLogger) {
   const mem = process.memoryUsage();
   log("HeapUsed", "gauge", mem.heapUsed);
   log("HeapTotal", "gauge", mem.heapTotal);
@@ -27,29 +32,25 @@ function log_memory_usage(log) {
 module.exports.log_metrics = (
   source,
   frequency_ms,
-  pause_threshold_ms = 1000
 ) => {
   const log = logger(source);
 
   setInterval(() => log_memory_usage(log), frequency_ms);
-  start_pause_detector(log, 100, pause_threshold_ms);
-  setInterval(() => log_pauses(log), frequency_ms);
+  log_event_loop_metrics(log, frequency_ms)
+  log_event_loop_lag(log, frequency_ms)
 };
 
-module.exports._get_last_period_pause_ms = () => _last_period_pause_ms;
-
-module.exports.log_event_loop_metrics = (
-  source: string,
+function log_event_loop_metrics (
+  log: metricLogger,
   frequency_ms: number = 30000
-) => {
-  const logger = new kv.logger(source);
+) {
+  let utl: EventLoopUtilization
   setInterval(() => {
-    const { idle, active, utilization } = performance.eventLoopUtilization();
-    logger.infoD("event-loop-utilization", {
+    const { idle, active, utilization } = performance.eventLoopUtilization(utl);
+    log("event-loop-utilization", "gauge", utilization, {
       idle,
       active,
-      utilization,
-    });
+    })
   }, frequency_ms);
 };
 
