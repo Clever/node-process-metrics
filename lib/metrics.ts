@@ -7,72 +7,77 @@ import {
 import * as http from "http";
 import * as kv from "kayvee";
 
-type jsonData = { [key: string]: any }
-type metricLogger = (title: string, type: string, value: number, data?: jsonData) => void
+type jsonData = { [key: string]: any };
+type metricLogger = (title: string, value: number, data?: jsonData) => void;
 
 function logger(source): metricLogger {
   const log = new kv.logger(source);
-  const env = process.env._DEPLOY_ENV
+  const env = process.env._DEPLOY_ENV;
 
-  return (title: string, type: string, value: number, data?: jsonData) => {
-    log.infoD(title, { type, value, env, via: "node-process-metrics", ...data });
+  return (title: string, value: number, data?: jsonData) => {
+    log.infoD(title, {
+      value,
+      env,
+      type: "gauge",
+      via: "node-process-metrics",
+      ...data,
+    });
   };
 }
 
 // log_memory_usage logs HeapUsed, HeapTotal, and RSS in the kayvee format
-function log_memory_usage(log: metricLogger) {
-  const mem = process.memoryUsage();
-  log("HeapUsed", "gauge", mem.heapUsed);
-  log("HeapTotal", "gauge", mem.heapTotal);
-  log("RSS", "gauge", mem.rss);
+function log_memory_usage(log: metricLogger, frequency_ms: number) {
+  setInterval(() => {
+    const mem = process.memoryUsage();
+    log("heap-used", mem.heapUsed);
+    log("heap-total", mem.heapTotal);
+    log("rss", mem.rss);
+  }, frequency_ms);
 }
 
 // log_metrics logs node process metrics at the specified frequency. It also logs every time the
 // node event loop stops processing all the events for more than a second.
 module.exports.log_metrics = (
-  source,
-  frequency_ms,
+  source: string,
+  frequency_ms: number = 30_000
 ) => {
   const log = logger(source);
 
-  setInterval(() => log_memory_usage(log), frequency_ms);
-  log_event_loop_metrics(log, frequency_ms)
-  log_event_loop_lag(log, frequency_ms)
+  log_memory_usage(log, frequency_ms);
+  log_event_loop_metrics(log, frequency_ms);
+  log_event_loop_lag(log, frequency_ms);
 };
 
-function log_event_loop_metrics (
-  log: metricLogger,
-  frequency_ms: number = 30000
-) {
-  let utl: EventLoopUtilization
+function log_event_loop_metrics(log: metricLogger, frequency_ms: number) {
+  let utl: EventLoopUtilization;
   setInterval(() => {
     const { idle, active, utilization } = performance.eventLoopUtilization(utl);
-    log("event-loop-utilization", "gauge", utilization, {
+    log("event-loop-utilization", utilization, {
       idle,
       active,
-    })
+    });
   }, frequency_ms);
-};
+}
 
-function log_event_loop_lag(
-  log: metricLogger,
-  frequency_ms: number,
-) {
-  let histogram: EventLoopDelayMonitor = monitorEventLoopDelay({ resolution: 100 })
-  histogram.enable()
+function log_event_loop_lag(log: metricLogger, frequency_ms: number) {
+  let histogram: EventLoopDelayMonitor = monitorEventLoopDelay({
+    resolution: 100,
+  });
+  histogram.enable();
+
   setInterval(() => {
-    histogram.disable()
+    histogram.disable();
 
-    const data: jsonData = {}
+    const data: jsonData = {};
     histogram.percentiles.forEach((v, k) => {
-      data[k.toString()] = v
-    })
+      data[k.toString()] = v;
+    });
 
-    log("event-loop-lag", "gauge", histogram.mean, data)
+    log("event-loop-lag", histogram.mean, data);
 
-    histogram = monitorEventLoopDelay({ resolution: 100 })
-    histogram.enable()
-  }, frequency_ms)
+    histogram = monitorEventLoopDelay({ resolution: 100 });
+    histogram.enable();
+  }, frequency_ms);
 }
 
 module.exports.log_active_connections = (
