@@ -49,9 +49,10 @@ module.exports.log_metrics = (
 };
 
 function log_event_loop_metrics(log: metricLogger, frequency_ms: number) {
-  let utl: EventLoopUtilization;
+  let last: EventLoopUtilization;
   setInterval(() => {
-    const { idle, active, utilization } = performance.eventLoopUtilization(utl);
+    last = performance.eventLoopUtilization(last);
+    const { idle, active, utilization } = last;
     log("event-loop-utilization", utilization, {
       idle,
       active,
