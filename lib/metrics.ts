@@ -2,15 +2,15 @@ import { performance } from "perf_hooks";
 import * as http from "http";
 import * as kv from "kayvee";
 
-const env = process.env.NODE_ENV || "staging"; // TODO: "staging" is a non-sense word at Clever
+type jsonData = { [key: string]: any }
+type metricLogger = (title: string, type: string, value: number, data?: jsonData) => void
 
-let _last_period_pause_ms = 0;
-
-function logger(source) {
+function logger(source): metricLogger {
   const log = new kv.logger(source);
+  const env = process.env._DEPLOY_ENV
 
-  return (title, type, value) => {
-    log.infoD(title, { type, value, env, via: "process-metrics" });
+  return (title: string, type: string, value: number, data?: jsonData) => {
+    log.infoD(title, { type, value, env, via: "node-process-metrics", ...data });
   };
 }
 
