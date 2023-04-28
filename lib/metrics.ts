@@ -28,10 +28,10 @@ function logger(source): metricLogger {
 // log_memory_usage logs HeapUsed, HeapTotal, and RSS in the kayvee format
 function log_memory_usage(log: metricLogger, frequency_ms: number) {
   setInterval(() => {
-    const mem = process.memoryUsage();
-    log("heap-used", mem.heapUsed);
-    log("heap-total", mem.heapTotal);
-    log("rss", mem.rss);
+    const { heapTotal, heapUsed, rss } = process.memoryUsage();
+    log("heap-used", heapUsed);
+    log("heap-total", heapTotal);
+    log("rss", rss);
   }, frequency_ms);
 }
 
