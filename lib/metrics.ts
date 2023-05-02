@@ -23,32 +23,35 @@ function logger(source): metricLogger {
   };
 }
 
-// log_metrics logs node process metrics at the specified frequency. It also logs every time the
-// node event loop stops processing all the events for more than a second.
+// log_metrics logs node process metrics at the specified frequency. The
+// metrics logged are as follows:
+//  - hepa memory used, total and rss
+//  - event loop utilization calculated, idle, and active
+//  - event loop lag p50, p90, p99, mean, and max values
 module.exports.log_metrics = (
   source: string,
   frequency_ms: number = 30_000
 ) => {
   const log = logger(source);
 
-  log_memory_usage(log, frequency_ms);
-  log_event_loop_utilization(log, frequency_ms);
-  log_event_loop_lag(log, frequency_ms);
+  start_memory_usage_logging(log, frequency_ms);
+  start_elu_logging(log, frequency_ms);
+  start_event_loop_lag_logging(log, frequency_ms);
 };
 
-// log_memory_usage logs HeapUsed, HeapTotal, and RSS in the kayvee format
-function log_memory_usage(log: metricLogger, frequency_ms: number) {
+
+function start_memory_usage_logging(log: metricLogger, frequency_ms: number) {
   setInterval(() => {
     const { heapTotal, heapUsed, rss } = process.memoryUsage();
     log("node-heap", {
       "heap-used": heapUsed,
       "heap-total": heapTotal,
-      rss
+      rss,
     });
   }, frequency_ms);
 }
 
-function log_event_loop_utilization(log: metricLogger, frequency_ms: number) {
+function start_elu_logging(log: metricLogger, frequency_ms: number) {
   let last: EventLoopUtilization;
   setInterval(() => {
     last = performance.eventLoopUtilization(last);
@@ -61,10 +64,9 @@ function log_event_loop_utilization(log: metricLogger, frequency_ms: number) {
   }, frequency_ms);
 }
 
-function log_event_loop_lag(log: metricLogger, frequency_ms: number) {
-  let histogram: EventLoopDelayMonitor = monitorEventLoopDelay({
-    resolution: 100,
-  });
+function start_event_loop_lag_logging(log: metricLogger, frequency_ms: number) {
+  const resolution = 100;
+  let histogram: EventLoopDelayMonitor = monitorEventLoopDelay({ resolution });
   histogram.enable();
 
   setInterval(() => {
@@ -80,7 +82,7 @@ function log_event_loop_lag(log: metricLogger, frequency_ms: number) {
 
     // The histogram disables itself every time the data is read from
     // so we must re-initialize it after every read.
-    histogram = monitorEventLoopDelay({ resolution: 100 });
+    histogram = monitorEventLoopDelay({ resolution });
     histogram.enable();
   }, frequency_ms);
 }
