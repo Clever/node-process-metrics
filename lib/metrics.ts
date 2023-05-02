@@ -39,7 +39,6 @@ module.exports.log_metrics = (
   start_event_loop_lag_logging(log, frequency_ms);
 };
 
-
 function start_memory_usage_logging(log: metricLogger, frequency_ms: number) {
   setInterval(() => {
     const { heapTotal, heapUsed, rss } = process.memoryUsage();
