@@ -1,91 +1,90 @@
-import { performance } from "perf_hooks";
+import {
+  performance,
+  EventLoopUtilization,
+  monitorEventLoopDelay,
+  EventLoopDelayMonitor,
+} from "perf_hooks";
 import * as http from "http";
 import * as kv from "kayvee";
 
-const env = process.env.NODE_ENV || "staging"; // TODO: "staging" is a non-sense word at Clever
+type jsonData = { [key: string]: any };
+type metricLogger = (title: string, data?: jsonData) => void;
 
-let _last_period_pause_ms = 0;
-
-function logger(source) {
+function logger(source): metricLogger {
   const log = new kv.logger(source);
+  const env = process.env._DEPLOY_ENV;
 
-  return (title, type, value) => {
-    log.infoD(title, { type, value, env, via: "process-metrics" });
+  return (title: string, data?: jsonData) => {
+    log.infoD(title, {
+      env,
+      via: "node-process-metrics",
+      ...data,
+    });
   };
 }
 
-// log_memory_usage logs HeapUsed, HeapTotal, and RSS in the kayvee format
-function log_memory_usage(log) {
-  const mem = process.memoryUsage();
-  log("HeapUsed", "gauge", mem.heapUsed);
-  log("HeapTotal", "gauge", mem.heapTotal);
-  log("RSS", "gauge", mem.rss);
-}
-
-// pause_detector is useful for determining if node isn't processing the event loop. There are
-// two common explanations for these pauses:
-// 1. The event loop is monopolized by one long request
-// 2. Node is garbage collecting
-// This works by sleeping for `sleep_time_ms` and then checking how long it's been since the pause
-// detector was last scheduled. If the difference between actual pause and `sleep_time_ms` is larger
-// than `pause_threshold_ms`, then we can infer that something was monopolizing the event loop.
-function start_pause_detector(log, sleep_time_ms, pause_threshold_ms) {
-  let last_time_ms = Date.now();
-
-  // This function gets called every pause_threshold_ms
-  const pause_fn = function () {
-    const current_time_ms = Date.now();
-    // pause_ms represents the "extra" time the server slept
-    const pause_ms = current_time_ms - last_time_ms - sleep_time_ms;
-
-    // If the pause is long enough, log it immediately so we can associate it with an api request
-    if (pause_ms > pause_threshold_ms) {
-      log("Pause Detected", "counter", pause_ms);
-    }
-
-    // Update the variables for the next call
-    _last_period_pause_ms += pause_ms;
-    last_time_ms = current_time_ms;
-  };
-
-  setInterval(pause_fn, sleep_time_ms);
-}
-
-function log_pauses(log) {
-  log("PauseMetric", "gauge", _last_period_pause_ms);
-  _last_period_pause_ms = 0;
-}
-
-// log_metrics logs node process metrics at the specified frequency. It also logs every time the
-// node event loop stops processing all the events for more than a second.
+// log_metrics logs node process metrics at the specified frequency. The
+// metrics logged are as follows:
+//  - hepa memory used, total and rss
+//  - event loop utilization calculated, idle, and active
+//  - event loop lag p50, p90, p99, mean, and max values
 module.exports.log_metrics = (
-  source,
-  frequency_ms,
-  pause_threshold_ms = 1000
+  source: string,
+  frequency_ms: number = 30_000
 ) => {
   const log = logger(source);
 
-  setInterval(() => log_memory_usage(log), frequency_ms);
-  start_pause_detector(log, 100, pause_threshold_ms);
-  setInterval(() => log_pauses(log), frequency_ms);
+  start_memory_usage_logging(log, frequency_ms);
+  start_elu_logging(log, frequency_ms);
+  start_event_loop_lag_logging(log, frequency_ms);
 };
 
-module.exports._get_last_period_pause_ms = () => _last_period_pause_ms;
-
-module.exports.log_event_loop_metrics = (
-  source: string,
-  frequency_ms: number = 30000
-) => {
-  const logger = new kv.logger(source);
+function start_memory_usage_logging(log: metricLogger, frequency_ms: number) {
   setInterval(() => {
-    const { idle, active, utilization } = performance.eventLoopUtilization();
-    logger.infoD("event-loop-utilization", {
-      idle,
-      active,
-      utilization,
+    const { heapTotal, heapUsed, rss } = process.memoryUsage();
+    log("node-heap", {
+      "heap-used": heapUsed,
+      "heap-total": heapTotal,
+      rss,
     });
   }, frequency_ms);
-};
+}
+
+function start_elu_logging(log: metricLogger, frequency_ms: number) {
+  let last: EventLoopUtilization;
+  setInterval(() => {
+    last = performance.eventLoopUtilization(last);
+    const { idle, active, utilization } = last;
+    log("event-loop-utilization", {
+      "elu-utilization": utilization,
+      "elu-idle": idle,
+      "elu-active": active,
+    });
+  }, frequency_ms);
+}
+
+function start_event_loop_lag_logging(log: metricLogger, frequency_ms: number) {
+  const resolution = 100;
+  let histogram: EventLoopDelayMonitor = monitorEventLoopDelay({ resolution });
+  histogram.enable();
+
+  setInterval(() => {
+    histogram.disable();
+
+    log("event-loop-lag", {
+      "el-lag-p99": histogram.percentile(99),
+      "el-lag-p90": histogram.percentile(90),
+      "el-lag-p50": histogram.percentile(50),
+      "el-lag-mean": histogram.mean,
+      "el-lag-max": histogram.max,
+    });
+
+    // The histogram disables itself every time the data is read from
+    // so we must re-initialize it after every read.
+    histogram = monitorEventLoopDelay({ resolution });
+    histogram.enable();
+  }, frequency_ms);
+}
 
 module.exports.log_active_connections = (
   source: string,
