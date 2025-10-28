@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: node-process-metrics
+  description: A library for tracking node.js process metrics
+  owner: unknown
+spec:
+  type: unknown
+  lifecycle: production
+  owner: unknown
+  system: Clever
